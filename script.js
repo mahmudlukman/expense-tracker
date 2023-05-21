@@ -7,15 +7,53 @@ const text = document.getElementById('text')
 const amount = document.getElementById('amount')
 
 
-const dummyTransactions = [
-  { id: 1, text: 'Flower', amount: -20 },
-  { id: 2, text: 'Salary', amount: 300 },
-  { id: 3, text: 'Book', amount: -10 },
-  { id: 4, text: 'Camera', amount: 150 }
-];
+// const dummyTransactions = [
+//   { id: 1, text: 'Flower', amount: -20 },
+//   { id: 2, text: 'Salary', amount: 300 },
+//   { id: 3, text: 'Book', amount: -10 },
+//   { id: 4, text: 'Camera', amount: 150 }
+// ];
 
 
-let transactions = dummyTransactions
+// let transactions = dummyTransactions
+
+const localStorageTransactions = JSON.parse(
+  localStorage.getItem('transactions')
+);
+
+let transactions =
+  localStorage.getItem('transactions') !== null ? localStorageTransactions : [];
+
+// Add transaction
+const addTransaction = (e) => {
+  e.preventDefault();
+
+  if (text.value.trim() === '' || amount.value.trim() === '') {
+    alert('Please add a text and amount');
+  } else {
+    const transaction = {
+      id: generateID(),
+      text: text.value,
+      amount: +amount.value
+    };
+
+    transactions.push(transaction);
+
+    addTransactionDOM(transaction);
+
+    updateValues();
+
+    updateLocalStorage();
+
+    text.value = '';
+    amount.value = '';
+  }
+}
+
+// Generate random ID
+const generateID = () => {
+  return Math.floor(Math.random() * 100000000);
+}
 
 // Add transaction to DOM list
 const addTransactionDOM = (transactions) => {
@@ -51,6 +89,21 @@ const updateValues = () => {
   console.log(expense)
 }
 
+// Remove transaction by ID
+const removeTransaction = (id) => {
+  transactions = transactions.filter(transaction => transaction.id !== id);
+
+  updateLocalStorage();
+
+  init();
+}
+
+// Update local storage transactions
+const updateLocalStorage = () => {
+  localStorage.setItem('transactions', JSON.stringify(transactions));
+}
+
+
 // Init app
 const init = () => {
   list.innerHTML = ''
@@ -60,5 +113,7 @@ const init = () => {
 }
 
 init()
+
+form.addEventListener('submit', addTransaction);
 
 
